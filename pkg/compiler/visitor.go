@@ -170,15 +170,19 @@ func (v *visitor) visitBodyStatement(c fql.IBodyStatementContext, scope *scope) 
 	ctx := c.(*fql.BodyStatementContext)
 
 	if variable := ctx.VariableDeclaration(); variable != nil {
-		return v.visitVariableDeclaration(variable.(fql.IVariableDeclarationContext), scope)
+		return v.visitVariableDeclaration(variable, scope)
 	}
 
 	if funcCall := ctx.FunctionCallExpression(); funcCall != nil {
-		return v.visitFunctionCallExpression(funcCall.(fql.IFunctionCallExpressionContext), scope)
+		return v.visitFunctionCallExpression(funcCall, scope)
 	}
 
 	if waitfor := ctx.WaitForExpression(); waitfor != nil {
-		return v.visitWaitForExpression(waitfor.(fql.IWaitForExpressionContext), scope)
+		return v.visitWaitForExpression(waitfor, scope)
+	}
+
+	if createEvent := ctx.CreateEventExpression(); createEvent != nil {
+		return v.visitCreateEventExpression(createEvent, scope)
 	}
 
 	return nil, v.unexpectedToken(ctx)
@@ -808,8 +812,8 @@ func (v *visitor) visitOptionsClause(c fql.IOptionsClauseContext, s *scope) (cor
 	return v.visitObjectLiteral(ctx.ObjectLiteral(), s)
 }
 
-func (v *visitor) visitWaitForEventNameContext(c fql.IWaitForEventNameContext, s *scope) (core.Expression, error) {
-	ctx := c.(*fql.WaitForEventNameContext)
+func (v *visitor) visitEventNameContext(c fql.IEventNameContext, s *scope) (core.Expression, error) {
+	ctx := c.(*fql.EventNameContext)
 
 	if str := ctx.StringLiteral(); str != nil {
 		return v.visitStringLiteral(str)
@@ -834,8 +838,34 @@ func (v *visitor) visitWaitForEventNameContext(c fql.IWaitForEventNameContext, s
 	return nil, ErrNotImplemented
 }
 
-func (v *visitor) visitWaitForEventSourceContext(c fql.IWaitForEventSourceContext, s *scope) (core.Expression, error) {
-	ctx := c.(*fql.WaitForEventSourceContext)
+func (v *visitor) visitEventSourceContext(c fql.IEventSourceContext, s *scope) (core.Expression, error) {
+	ctx := c.(*fql.EventSourceContext)
+
+	if variable := ctx.Variable(); variable != nil {
+		return v.visitVariable(variable, s)
+	}
+
+	if member := ctx.MemberExpression(); member != nil {
+		return v.visitMemberExpression(member, s)
+	}
+
+	if fnCall := ctx.FunctionCallExpression(); fnCall != nil {
+		return v.visitFunctionCallExpression(fnCall, s)
+	}
+
+	return nil, ErrNotImplemented
+}
+
+func (v *visitor) visitEventArgsContext(c fql.IEventArgumentsContext, s *scope) (core.Expression, error) {
+	ctx := c.(*fql.EventArgumentsContext)
+
+	if literal := ctx.Literal(); literal != nil {
+		return v.visitLiteral(literal, s)
+	}
+
+	if param := ctx.Param(); param != nil {
+		return v.visitParam(param, s)
+	}
 
 	if variable := ctx.Variable(); variable != nil {
 		return v.visitVariable(variable, s)
@@ -878,16 +908,80 @@ func (v *visitor) visitTimeoutClause(c fql.ITimeoutClauseContext, s *scope) (cor
 	return nil, ErrNotImplemented
 }
 
-func (v *visitor) visitWaitForExpression(c fql.IWaitForExpressionContext, s *scope) (core.Expression, error) {
-	ctx := c.(*fql.WaitForExpressionContext)
+func (v *visitor) visitCreateEventExpression(c fql.ICreateEventExpressionContext, s *scope) (core.Expression, error) {
+	ctx := c.(*fql.CreateEventExpressionContext)
 
-	eventName, err := v.visitWaitForEventNameContext(ctx.WaitForEventName(), s)
+	eventName, err := v.visitEventNameContext(ctx.EventName(), s)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid event name")
 	}
 
-	eventSource, err := v.visitWaitForEventSourceContext(ctx.WaitForEventSource(), s)
+	eventSource, err := v.visitEventSourceContext(ctx.EventSource(), s)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid event source")
+	}
+
+	createEvtExp, err := expressions.NewCreateEventExpression(
+		v.getSourceMap(ctx),
+		eventName,
+		eventSource,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if argsCtx := ctx.EventArguments(); argsCtx != nil {
+		argsExp, err := v.visitEventArgsContext(argsCtx, s)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid arguments")
+		}
+
+		if err := createEvtExp.SetArguments(argsExp); err != nil {
+			return nil, err
+		}
+	}
+
+	if optionsCtx := ctx.OptionsClause(); optionsCtx != nil {
+		optionsExp, err := v.visitOptionsClause(optionsCtx, s)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid options")
+		}
+
+		if err := createEvtExp.SetOptions(optionsExp); err != nil {
+			return nil, err
+		}
+	}
+
+	if timeoutCtx := ctx.TimeoutClause(); timeoutCtx != nil {
+		timeoutExp, err := v.visitTimeoutClause(timeoutCtx, s)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid timeout")
+		}
+
+		if err := createEvtExp.SetTimeout(timeoutExp); err != nil {
+			return nil, err
+		}
+	}
+
+	return createEvtExp, nil
+}
+
+func (v *visitor) visitWaitForExpression(c fql.IWaitForExpressionContext, s *scope) (core.Expression, error) {
+	ctx := c.(*fql.WaitForExpressionContext)
+
+	eventName, err := v.visitEventNameContext(ctx.EventName(), s)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid event name")
+	}
+
+	eventSource, err := v.visitEventSourceContext(ctx.EventSource(), s)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid event source")

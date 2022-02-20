@@ -18,7 +18,7 @@ type (
 	TestObservable struct {
 		*values.Object
 
-		eventName string
+		eventName values.String
 		messages  []events.Message
 		delay     time.Duration
 		calls     []events.Subscription
@@ -58,7 +58,7 @@ func (s TestStream) Read(ctx context.Context) <-chan events.Message {
 	return s
 }
 
-func NewTestObservable(eventName string, messages []events.Message, delay time.Duration) *TestObservable {
+func NewTestObservable(eventName values.String, messages []events.Message, delay time.Duration) *TestObservable {
 	return &TestObservable{
 		Object:    values.NewObject(),
 		eventName: eventName,
@@ -133,7 +133,7 @@ func newCompilerWithObservable() *compiler.Compiler {
 						return true
 					})
 
-					return NewTestObservable(name.String(), evts, time.Duration(num)), nil
+					return NewTestObservable(name, evts, time.Duration(num)), nil
 				},
 				"ERR": func(ctx context.Context, args ...core.Value) (core.Value, error) {
 					if err := core.ValidateArgs(args, 3, 3); err != nil {
@@ -156,7 +156,7 @@ func newCompilerWithObservable() *compiler.Compiler {
 					str := values.ToString(args[1])
 					num := values.ToInt(args[1])
 
-					return NewTestObservable(name.String(), []events.Message{events.WithErr(errors.New(str.String()))}, time.Duration(num)*time.Millisecond), nil
+					return NewTestObservable(name, []events.Message{events.WithErr(errors.New(str.String()))}, time.Duration(num)*time.Millisecond), nil
 
 				},
 			},

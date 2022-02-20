@@ -91,11 +91,17 @@ type FqlParserListener interface {
 	// EnterWaitForExpression is called when entering the waitForExpression production.
 	EnterWaitForExpression(c *WaitForExpressionContext)
 
-	// EnterWaitForEventName is called when entering the waitForEventName production.
-	EnterWaitForEventName(c *WaitForEventNameContext)
+	// EnterCreateEventExpression is called when entering the createEventExpression production.
+	EnterCreateEventExpression(c *CreateEventExpressionContext)
 
-	// EnterWaitForEventSource is called when entering the waitForEventSource production.
-	EnterWaitForEventSource(c *WaitForEventSourceContext)
+	// EnterEventName is called when entering the eventName production.
+	EnterEventName(c *EventNameContext)
+
+	// EnterEventSource is called when entering the eventSource production.
+	EnterEventSource(c *EventSourceContext)
+
+	// EnterEventArguments is called when entering the eventArguments production.
+	EnterEventArguments(c *EventArgumentsContext)
 
 	// EnterOptionsClause is called when entering the optionsClause production.
 	EnterOptionsClause(c *OptionsClauseContext)
@@ -307,11 +313,17 @@ type FqlParserListener interface {
 	// ExitWaitForExpression is called when exiting the waitForExpression production.
 	ExitWaitForExpression(c *WaitForExpressionContext)
 
-	// ExitWaitForEventName is called when exiting the waitForEventName production.
-	ExitWaitForEventName(c *WaitForEventNameContext)
+	// ExitCreateEventExpression is called when exiting the createEventExpression production.
+	ExitCreateEventExpression(c *CreateEventExpressionContext)
 
-	// ExitWaitForEventSource is called when exiting the waitForEventSource production.
-	ExitWaitForEventSource(c *WaitForEventSourceContext)
+	// ExitEventName is called when exiting the eventName production.
+	ExitEventName(c *EventNameContext)
+
+	// ExitEventSource is called when exiting the eventSource production.
+	ExitEventSource(c *EventSourceContext)
+
+	// ExitEventArguments is called when exiting the eventArguments production.
+	ExitEventArguments(c *EventArgumentsContext)
 
 	// ExitOptionsClause is called when exiting the optionsClause production.
 	ExitOptionsClause(c *OptionsClauseContext)

@@ -91,11 +91,17 @@ type FqlParserVisitor interface {
 	// Visit a parse tree produced by FqlParser#waitForExpression.
 	VisitWaitForExpression(ctx *WaitForExpressionContext) interface{}
 
-	// Visit a parse tree produced by FqlParser#waitForEventName.
-	VisitWaitForEventName(ctx *WaitForEventNameContext) interface{}
+	// Visit a parse tree produced by FqlParser#createEventExpression.
+	VisitCreateEventExpression(ctx *CreateEventExpressionContext) interface{}
 
-	// Visit a parse tree produced by FqlParser#waitForEventSource.
-	VisitWaitForEventSource(ctx *WaitForEventSourceContext) interface{}
+	// Visit a parse tree produced by FqlParser#eventName.
+	VisitEventName(ctx *EventNameContext) interface{}
+
+	// Visit a parse tree produced by FqlParser#eventSource.
+	VisitEventSource(ctx *EventSourceContext) interface{}
+
+	// Visit a parse tree produced by FqlParser#eventArguments.
+	VisitEventArguments(ctx *EventArgumentsContext) interface{}
 
 	// Visit a parse tree produced by FqlParser#optionsClause.
 	VisitOptionsClause(ctx *OptionsClauseContext) interface{}

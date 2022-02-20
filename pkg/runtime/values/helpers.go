@@ -611,3 +611,26 @@ func UnwrapStrings(values []String) []string {
 
 	return out
 }
+
+func IsNoneOrNil(value core.Value) bool {
+	return value == None || core.IsNil(value)
+}
+
+func Compare(first, second core.Value) int64 {
+	firstIsNil := IsNoneOrNil(first)
+	secondIsNil := IsNoneOrNil(second)
+
+	if firstIsNil && secondIsNil {
+		return 0
+	}
+
+	if !firstIsNil && secondIsNil {
+		return 1
+	}
+
+	if firstIsNil && !secondIsNil {
+		return -1
+	}
+
+	return first.Compare(second)
+}

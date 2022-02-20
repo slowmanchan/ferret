@@ -6,6 +6,8 @@ import (
 	"github.com/MontFerret/ferret/pkg/runtime/values"
 )
 
+const DefaultTimeout = 5000
+
 type (
 	strm chan Message
 

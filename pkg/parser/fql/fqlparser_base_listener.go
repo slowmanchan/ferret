@@ -188,17 +188,29 @@ func (s *BaseFqlParserListener) EnterWaitForExpression(ctx *WaitForExpressionCon
 // ExitWaitForExpression is called when production waitForExpression is exited.
 func (s *BaseFqlParserListener) ExitWaitForExpression(ctx *WaitForExpressionContext) {}
 
-// EnterWaitForEventName is called when production waitForEventName is entered.
-func (s *BaseFqlParserListener) EnterWaitForEventName(ctx *WaitForEventNameContext) {}
+// EnterCreateEventExpression is called when production createEventExpression is entered.
+func (s *BaseFqlParserListener) EnterCreateEventExpression(ctx *CreateEventExpressionContext) {}
 
-// ExitWaitForEventName is called when production waitForEventName is exited.
-func (s *BaseFqlParserListener) ExitWaitForEventName(ctx *WaitForEventNameContext) {}
+// ExitCreateEventExpression is called when production createEventExpression is exited.
+func (s *BaseFqlParserListener) ExitCreateEventExpression(ctx *CreateEventExpressionContext) {}
 
-// EnterWaitForEventSource is called when production waitForEventSource is entered.
-func (s *BaseFqlParserListener) EnterWaitForEventSource(ctx *WaitForEventSourceContext) {}
+// EnterEventName is called when production eventName is entered.
+func (s *BaseFqlParserListener) EnterEventName(ctx *EventNameContext) {}
 
-// ExitWaitForEventSource is called when production waitForEventSource is exited.
-func (s *BaseFqlParserListener) ExitWaitForEventSource(ctx *WaitForEventSourceContext) {}
+// ExitEventName is called when production eventName is exited.
+func (s *BaseFqlParserListener) ExitEventName(ctx *EventNameContext) {}
+
+// EnterEventSource is called when production eventSource is entered.
+func (s *BaseFqlParserListener) EnterEventSource(ctx *EventSourceContext) {}
+
+// ExitEventSource is called when production eventSource is exited.
+func (s *BaseFqlParserListener) ExitEventSource(ctx *EventSourceContext) {}
+
+// EnterEventArguments is called when production eventArguments is entered.
+func (s *BaseFqlParserListener) EnterEventArguments(ctx *EventArgumentsContext) {}
+
+// ExitEventArguments is called when production eventArguments is exited.
+func (s *BaseFqlParserListener) ExitEventArguments(ctx *EventArgumentsContext) {}
 
 // EnterOptionsClause is called when production optionsClause is entered.
 func (s *BaseFqlParserListener) EnterOptionsClause(ctx *OptionsClauseContext) {}

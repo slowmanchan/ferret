@@ -51,6 +51,7 @@ RegexMatch: '=~';
 For: 'FOR';
 Return: 'RETURN';
 Waitfor: 'WAITFOR';
+Create: 'CREATE';
 Options: 'OPTIONS';
 Timeout: 'TIMEOUT';
 Distinct: 'DISTINCT';

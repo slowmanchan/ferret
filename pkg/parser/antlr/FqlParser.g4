@@ -28,6 +28,7 @@ bodyStatement
     : variableDeclaration
     | functionCallExpression
     | waitForExpression
+    | createEventExpression
     ;
 
 bodyExpression
@@ -144,20 +145,33 @@ collectCounter
     ;
 
 waitForExpression
-    : Waitfor Event waitForEventName In waitForEventSource (optionsClause)? (filterClause)? (timeoutClause)?
+    : Waitfor Event eventName In eventSource (optionsClause)? (filterClause)? (timeoutClause)?
     ;
 
-waitForEventName
-    : stringLiteral
+createEventExpression
+    : Create Event eventName In eventSource (With eventArguments)? (optionsClause)? (filterClause)? (timeoutClause)?
+    ;
+
+eventName
+    :
+    | stringLiteral
     | variable
     | param
     | functionCallExpression
     | memberExpression
     ;
 
-waitForEventSource
+eventSource
     : functionCallExpression
     | variable
+    | memberExpression
+    ;
+
+eventArguments
+    : literal
+    | variable
+    | param
+    | functionCallExpression
     | memberExpression
     ;
 
@@ -308,6 +322,7 @@ unsafeReservedWord
     | Let
     | Use
     | Waitfor
+    | Create
     | While
     | Do
     | In
@@ -353,7 +368,7 @@ expressionAtom
     | variable
     | memberExpression
     | param
-    | OpenParen (forExpression | waitForExpression | expression) CloseParen errorOperator?
+    | OpenParen (forExpression | waitForExpression | createEventExpression | expression) CloseParen errorOperator?
     ;
 
 arrayOperator

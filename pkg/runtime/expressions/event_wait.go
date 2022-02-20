@@ -2,30 +2,17 @@ package expressions
 
 import (
 	"context"
-	"time"
-
 	"github.com/pkg/errors"
 
 	"github.com/MontFerret/ferret/pkg/runtime/collections"
 	"github.com/MontFerret/ferret/pkg/runtime/core"
 	"github.com/MontFerret/ferret/pkg/runtime/events"
 	"github.com/MontFerret/ferret/pkg/runtime/expressions/clauses"
-	"github.com/MontFerret/ferret/pkg/runtime/expressions/literals"
 	"github.com/MontFerret/ferret/pkg/runtime/values"
-	"github.com/MontFerret/ferret/pkg/runtime/values/types"
 )
 
-const DefaultWaitTimeout = 5000
-
 type WaitForEventExpression struct {
-	src            core.SourceMap
-	eventName      core.Expression
-	eventSource    core.Expression
-	options        core.Expression
-	timeout        core.Expression
-	filterSrc      core.SourceMap
-	filter         core.Expression
-	filterVariable string
+	*eventExpression
 }
 
 func NewWaitForEventExpression(
@@ -33,56 +20,15 @@ func NewWaitForEventExpression(
 	eventName core.Expression,
 	eventSource core.Expression,
 ) (*WaitForEventExpression, error) {
-	if eventName == nil {
-		return nil, core.Error(core.ErrInvalidArgument, "event name")
-	}
+	base, err := newEventExpression(src, eventName, eventSource)
 
-	if eventSource == nil {
-		return nil, core.Error(core.ErrMissedArgument, "event source")
+	if err != nil {
+		return nil, err
 	}
 
 	return &WaitForEventExpression{
-		src:         src,
-		eventName:   eventName,
-		eventSource: eventSource,
-		timeout:     literals.NewIntLiteral(DefaultWaitTimeout),
+		eventExpression: base,
 	}, nil
-}
-
-func (e *WaitForEventExpression) SetOptions(options core.Expression) error {
-	if options == nil {
-		return core.ErrInvalidArgument
-	}
-
-	e.options = options
-
-	return nil
-}
-
-func (e *WaitForEventExpression) SetTimeout(timeout core.Expression) error {
-	if timeout == nil {
-		return core.ErrInvalidArgument
-	}
-
-	e.timeout = timeout
-
-	return nil
-}
-
-func (e *WaitForEventExpression) SetFilter(src core.SourceMap, variable string, exp core.Expression) error {
-	if variable == "" {
-		return core.ErrInvalidArgument
-	}
-
-	if exp == nil {
-		return core.ErrInvalidArgument
-	}
-
-	e.filterSrc = src
-	e.filterVariable = variable
-	e.filter = exp
-
-	return nil
 }
 
 func (e *WaitForEventExpression) Exec(ctx context.Context, scope *core.Scope) (core.Value, error) {
@@ -194,44 +140,4 @@ func (e *WaitForEventExpression) consumeFiltered(ctx context.Context, scope *cor
 	}
 
 	return out.GetVariable(e.filterVariable)
-}
-
-func (e *WaitForEventExpression) getEventName(ctx context.Context, scope *core.Scope) (string, error) {
-	eventName, err := e.eventName.Exec(ctx, scope)
-
-	if err != nil {
-		return "", err
-	}
-
-	return eventName.String(), nil
-}
-
-func (e *WaitForEventExpression) getOptions(ctx context.Context, scope *core.Scope) (*values.Object, error) {
-	if e.options == nil {
-		return nil, nil
-	}
-
-	options, err := e.options.Exec(ctx, scope)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if err := core.ValidateType(options, types.Object); err != nil {
-		return nil, err
-	}
-
-	return options.(*values.Object), nil
-}
-
-func (e *WaitForEventExpression) getTimeout(ctx context.Context, scope *core.Scope) (time.Duration, error) {
-	timeoutValue, err := e.timeout.Exec(ctx, scope)
-
-	if err != nil {
-		return 0, err
-	}
-
-	timeoutInt := values.ToIntDefault(timeoutValue, DefaultWaitTimeout)
-
-	return time.Duration(timeoutInt) * time.Millisecond, nil
 }

@@ -10,7 +10,7 @@ type (
 	// Subscription represents an event subscription object that contains target event name
 	// and optional event options.
 	Subscription struct {
-		EventName string
+		EventName values.String
 		Options   *values.Object
 	}
 

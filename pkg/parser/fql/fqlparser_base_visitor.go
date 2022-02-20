@@ -119,11 +119,19 @@ func (v *BaseFqlParserVisitor) VisitWaitForExpression(ctx *WaitForExpressionCont
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseFqlParserVisitor) VisitWaitForEventName(ctx *WaitForEventNameContext) interface{} {
+func (v *BaseFqlParserVisitor) VisitCreateEventExpression(ctx *CreateEventExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseFqlParserVisitor) VisitWaitForEventSource(ctx *WaitForEventSourceContext) interface{} {
+func (v *BaseFqlParserVisitor) VisitEventName(ctx *EventNameContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseFqlParserVisitor) VisitEventSource(ctx *EventSourceContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseFqlParserVisitor) VisitEventArguments(ctx *EventArgumentsContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
